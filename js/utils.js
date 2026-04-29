@@ -83,7 +83,7 @@ function formatearFecha(iso) {
   
   return {
     dia: `${dias[fecha.getUTCDay()]} ${d} de ${meses[m - 1]}`,
-    hora: "TM 08:30hs - TN 18:00 hs", // Se puede traer desde sheet, pero no justifica
+    hora: "TM 08:30hs - TN 19:00 hs", // Se puede traer desde sheet, pero no justifica
     corto: `${dias[fecha.getUTCDay()].slice(0, 3)} ${d}/${m}`,
   };
 }
