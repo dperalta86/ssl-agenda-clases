@@ -161,6 +161,8 @@ async function inicializarPortal() {
 function configurarEventos() {
   // Llenar datos del header
   const brandSsl = document.querySelector(".brand-ssl");
+  const header = document.querySelector(".header");
+  const menuToggle = document.getElementById("menu-toggle");
   const institutionEl = document.getElementById("brand-institution");
   const subjectEl = document.getElementById("brand-subject");
   const coursesEl = document.getElementById("brand-courses");
@@ -171,6 +173,37 @@ function configurarEventos() {
   if (coursesEl) {
     const cursosText = CONFIG.cursos.join(" • ");
     coursesEl.textContent = cursosText;
+  }
+
+  if (menuToggle && header) {
+    const closeMenu = () => {
+      header.classList.remove("menu-open");
+      menuToggle.setAttribute("aria-expanded", "false");
+      menuToggle.setAttribute("aria-label", "Abrir menú");
+    };
+
+    menuToggle.addEventListener("click", (event) => {
+      event.stopPropagation();
+      const isOpen = header.classList.toggle("menu-open");
+      menuToggle.setAttribute("aria-expanded", String(isOpen));
+      menuToggle.setAttribute("aria-label", isOpen ? "Cerrar menú" : "Abrir menú");
+    });
+
+    document.addEventListener("click", (event) => {
+      if (!header.contains(event.target)) {
+        closeMenu();
+      }
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        closeMenu();
+      }
+    });
+
+    document.querySelectorAll("#quick-links .qlink").forEach(link => {
+      link.addEventListener("click", closeMenu);
+    });
   }
   
   // Botón "volver a próxima clase" (dentro de la sección de clases pasadas)
