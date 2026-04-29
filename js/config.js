@@ -3,9 +3,26 @@
  * Editar solo esta sección para personalizar el portal
  */
 
+function obtenerAppsScriptUrlPorDefecto() {
+  if (typeof window !== "undefined") {
+    const host = window.location.hostname;
+    const esLocal =
+      window.location.protocol === "file:" ||
+      host === "localhost" ||
+      host === "127.0.0.1" ||
+      host === "::1";
+
+    if (esLocal) {
+      return "https://script.google.com/macros/s/AKfycbyVXCAwZldmCHijA1HsaKiU3vCftaoJrk1LoJgq76jOupb-fLX6FfIHa6RmWqIsq3oN/exec";
+    }
+  }
+
+  return "/api/clases";
+}
+
 const CONFIG = {
-  // URL del Apps Script publicado (dejar "TU_" al inicio para usar datos mock)
-  appsScriptUrl: "https://script.google.com/macros/s/AKfycbyVXCAwZldmCHijA1HsaKiU3vCftaoJrk1LoJgq76jOupb-fLX6FfIHa6RmWqIsq3oN/exec",
+  // URL del endpoint de clases (en Vercel usa /api/clases; en local cae al Apps Script)
+  appsScriptUrl: obtenerAppsScriptUrlPorDefecto(),
   
   // Datos de la institución y materia
   institucion: "UTN - FRBA",
@@ -15,9 +32,10 @@ const CONFIG = {
   
   // Links de acceso rápido
   linksRapidos: {
-    zoom: " https://utn.zoom.us/j/92986126057",
+    zoom: "https://utn.zoom.us/j/92986126057",
     discord: "https://discord.gg/RUp9WsuF",
-    onenote: "https://1drv.ms/u/s!AtF4l4L_a6hzgg3tRhA-xop5NY9Y"
+    onenote: "https://1drv.ms/u/s!AtF4l4L_a6hzgg3tRhA-xop5NY9Y",
+    notebooklm: "#",
   },
   
   // Avisos manuales (se muestran debajo de la próxima clase)

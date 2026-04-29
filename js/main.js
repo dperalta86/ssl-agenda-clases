@@ -116,6 +116,44 @@ function renderPortal(clases) {
 }
 
 /**
+ * Actualiza los datos visibles del header y los links rápidos.
+ */
+function actualizarHeader() {
+  const brandSsl = document.querySelector(".brand-ssl");
+  const institutionEl = document.getElementById("brand-institution");
+  const subjectEl = document.getElementById("brand-subject");
+  const coursesEl = document.getElementById("brand-courses");
+
+  if (brandSsl) brandSsl.textContent = CONFIG.materiaCorta || "SSL";
+  if (institutionEl) institutionEl.textContent = CONFIG.institucion;
+  if (subjectEl) subjectEl.textContent = CONFIG.materiaNombre;
+  if (coursesEl) {
+    coursesEl.textContent = CONFIG.cursos.join(" • ");
+  }
+
+  const zoomLink = document.getElementById("zoom-link");
+  const discordLink = document.getElementById("discord-link");
+  const onenoteLink = document.getElementById("onenote-link");
+  const notebooklmLink = document.getElementById("notebooklm-link");
+
+  if (zoomLink && CONFIG.linksRapidos.zoom !== "#") {
+    zoomLink.href = CONFIG.linksRapidos.zoom;
+  }
+
+  if (discordLink && CONFIG.linksRapidos.discord !== "#") {
+    discordLink.href = CONFIG.linksRapidos.discord;
+  }
+
+  if (onenoteLink && CONFIG.linksRapidos.onenote !== "#") {
+    onenoteLink.href = CONFIG.linksRapidos.onenote;
+  }
+
+  if (notebooklmLink && CONFIG.linksRapidos.notebooklm !== "#") {
+    notebooklmLink.href = CONFIG.linksRapidos.notebooklm;
+  }
+}
+
+/**
  * Carga los datos y renderiza el portal
  */
 async function inicializarPortal() {
@@ -129,12 +167,13 @@ async function inicializarPortal() {
       </div>
     `;
 
-    // Cargar configuración remota si existe (Vercel env)
+    // Pintar header con la configuración disponible y refrescarlo cuando llegue la remota.
+    actualizarHeader();
     if (typeof cargarConfiguracionRemota === "function") {
-      await cargarConfiguracionRemota();
+      cargarConfiguracionRemota().then(actualizarHeader);
     }
-    
-    // Cargar clases desde API o mock
+
+    // Arrancar la carga de clases sin esperar la configuración remota.
     clasesGlobales = await cargarClasesDesdeAPI();
     
     // Validar estructura mínima de los datos
@@ -159,21 +198,9 @@ async function inicializarPortal() {
  * Configura todos los eventos de la página
  */
 function configurarEventos() {
-  // Llenar datos del header
-  const brandSsl = document.querySelector(".brand-ssl");
   const header = document.querySelector(".header");
   const menuToggle = document.getElementById("menu-toggle");
-  const institutionEl = document.getElementById("brand-institution");
-  const subjectEl = document.getElementById("brand-subject");
-  const coursesEl = document.getElementById("brand-courses");
-  
-  if (brandSsl) brandSsl.textContent = CONFIG.materiaCorta || "SSL";
-  if (institutionEl) institutionEl.textContent = CONFIG.institucion;
-  if (subjectEl) subjectEl.textContent = CONFIG.materiaNombre;
-  if (coursesEl) {
-    const cursosText = CONFIG.cursos.join(" • ");
-    coursesEl.textContent = cursosText;
-  }
+  actualizarHeader();
 
   if (menuToggle && header) {
     const closeMenu = () => {
@@ -218,22 +245,6 @@ function configurarEventos() {
     stickyBtn.addEventListener("click", scrollToNext);
   }
   
-  // Configurar links rápidos del header con las URLs reales
-  const zoomLink = document.getElementById("zoom-link");
-  const discordLink = document.getElementById("discord-link");
-  const onenoteLink = document.getElementById("onenote-link");
-  
-  if (zoomLink && CONFIG.linksRapidos.zoom !== "#") {
-    zoomLink.href = CONFIG.linksRapidos.zoom;
-  }
-  
-  if (discordLink && CONFIG.linksRapidos.discord !== "#") {
-    discordLink.href = CONFIG.linksRapidos.discord;
-  }
-  
-  if (onenoteLink && CONFIG.linksRapidos.onenote !== "#") {
-    onenoteLink.href = CONFIG.linksRapidos.onenote;
-  }
 }
 
 /**

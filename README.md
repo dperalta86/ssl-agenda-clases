@@ -16,15 +16,17 @@ La aplicación es una web estática con JavaScript simple.
 1. `js/config.js` define la configuración local por defecto.
 2. `js/config.js` también intenta cargar configuración remota desde `/api/config`.
 3. `api/config.js` expone variables de entorno en Vercel.
-4. `js/api.js` consume el Apps Script publicado de Google Sheets.
-5. `js/main.js` ordena las clases, decide cuál es la próxima y renderiza la UI.
-6. `js/render.js` arma el HTML de las cards.
+4. `api/clases.js` hace de proxy seguro al Apps Script y habilita cache HTTP.
+5. `js/api.js` consume el endpoint de clases.
+6. `js/main.js` ordena las clases, decide cuál es la próxima y renderiza la UI.
+7. `js/render.js` arma el HTML de las cards.
 
 ## Flujo de datos
 
 - La información de clases vive en Google Sheets.
 - Un Apps Script publica esos datos como JSON.
-- El frontend consume ese JSON y lo transforma en la agenda visual.
+- En Vercel, `api/clases.js` actúa como proxy y el frontend consume ese endpoint same-origin.
+- El frontend transforma ese JSON en la agenda visual.
 - Si no existe config remota, la web usa los valores locales del repo como fallback.
 
 ## Variables de entorno en Vercel
@@ -35,6 +37,7 @@ Estas variables se leen desde `api/config.js`:
 - `ZOOM_URL`
 - `DISCORD_URL`
 - `ONENOTE_URL`
+- `NOTEBOOKLM_URL`
 - `INSTITUCION`
 - `MATERIA_CORTA`
 - `MATERIA_NOMBRE`
@@ -49,6 +52,8 @@ El motivo es que el proyecto ya tiene fallback en `js/config.js` y la carga remo
 Si querés probar valores distintos en local, lo más simple es:
 - editar `js/config.js`, o
 - levantar un entorno que implemente `/api/config`.
+
+Para probar el proxy de clases en local, además necesitás una ruta `/api/clases` o usar el Apps Script directo desde `js/config.js`.
 
 ## Archivos principales
 

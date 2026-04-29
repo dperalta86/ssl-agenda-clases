@@ -4,7 +4,7 @@ module.exports = (req, res) => {
   res.status(200).json({
     ok: true,
     config: {
-      appsScriptUrl: process.env.APPS_SCRIPT_URL || "",
+      appsScriptUrl: "/api/clases",
       institucion: process.env.INSTITUCION || "UTN - FRBA",
       materiaCorta: process.env.MATERIA_CORTA || "SSL",
       materiaNombre: process.env.MATERIA_NOMBRE || "Sintaxis y Semántica de los Lenguajes",
@@ -13,6 +13,7 @@ module.exports = (req, res) => {
         zoom: process.env.ZOOM_URL || "#",
         discord: process.env.DISCORD_URL || "#",
         onenote: process.env.ONENOTE_URL || "#",
+        notebooklm: process.env.NOTEBOOKLM_URL || "#",
       },
     },
   });
