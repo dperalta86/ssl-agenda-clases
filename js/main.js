@@ -154,6 +154,78 @@ function actualizarHeader() {
 }
 
 /**
+ * Renderiza un banner con las entregas próximas y atrasadas
+ * @param {Array} entregas - Lista de entregas con fecha, tipo y URL
+ * @returns {void}
+ */
+function renderBannerEntregas(entregas) {
+  const hoy = new Date();
+  hoy.setHours(0, 0, 0, 0);
+
+  const DIAS_FUTURO = 10;
+  const DIAS_PASADO = 3;
+
+  const items = entregas
+    .map(e => {
+      if (!e.fecha) return null;
+      const fecha = new Date(e.fecha);
+      fecha.setHours(0, 0, 0, 0);
+      const diff = Math.round((fecha - hoy) / 86400000); // días
+      return { ...e, diff };
+    })
+    .filter(e => e && e.diff >= -DIAS_PASADO && e.diff <= DIAS_FUTURO)
+    .sort((a, b) => a.diff - b.diff);
+
+  const banner = document.getElementById("entregas-banner");
+  if (!banner) return;
+
+  if (items.length === 0) {
+    banner.style.display = "none";
+    return;
+  }
+
+  const urgentes = items.filter(e => e.diff >= 0 && e.diff <= 3).length;
+  const badgeHtml = urgentes > 0
+    ? `<span class="eb-badge">${urgentes}</span>`
+    : "";
+
+  const itemsHtml = items.map(e => {
+    let estado, etiqueta;
+    if (e.diff < 0) {
+      estado = "dead";
+      etiqueta = e.diff === -1 ? "ayer" : `hace ${Math.abs(e.diff)}d`;
+    } else if (e.diff === 0) {
+      estado = "urgent";
+      etiqueta = "hoy";
+    } else if (e.diff <= 3) {
+      estado = "urgent";
+      etiqueta = `en ${e.diff}d`;
+    } else {
+      estado = "upcoming";
+      etiqueta = `en ${e.diff}d`;
+    }
+
+    const icono = { Lab: "🧪", TP: "📦", Parcial: "⚡", Cuestionario: "📝", Práctica: "✏️" }[e.tipo] || "📌";
+    const link = e.url ? `href="${e.url}" target="_blank" rel="noopener"` : "";
+    const tag = e.url ? "a" : "div";
+
+    return `
+      <${tag} class="eb-item eb-${estado}" ${link}>
+        <span class="eb-icon">${icono}</span>
+        <span class="eb-nombre">${escapeHtml(e.nombre)}</span>
+        <span class="eb-fecha">${etiqueta}</span>
+      </${tag}>`;
+  }).join("");
+
+  banner.innerHTML = `
+    <div class="eb-inner">
+      <span class="eb-titulo">// entregas ${badgeHtml}</span>
+      <div class="eb-lista">${itemsHtml}</div>
+    </div>`;
+  banner.style.display = "";
+}
+
+/**
  * Carga los datos y renderiza el portal
  */
 async function inicializarPortal() {
@@ -174,7 +246,10 @@ async function inicializarPortal() {
     }
 
     // Arrancar la carga de clases sin esperar la configuración remota.
-    clasesGlobales = await cargarClasesDesdeAPI();
+    const datos = await cargarClasesDesdeAPI();
+    clasesGlobales = datos.clases;
+    const entregas = datos.entregas || [];
+    renderBannerEntregas(entregas);
     
     // Validar estructura mínima de los datos
     if (!clasesGlobales.every(c => c.numero && c.temas)) {
