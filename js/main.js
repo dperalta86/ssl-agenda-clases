@@ -24,6 +24,10 @@ function crearSnapshotDatos(datos) {
   return JSON.stringify(payload);
 }
 
+function esSinClase(clase) {
+  return String(clase?.tipo || "").toLowerCase().includes("sin clase");
+}
+
 /**
  * Convierte una fecha del backend a timestamp local para comparaciones.
  * @param {string} fecha - Fecha en cualquier formato parseable por Date.
@@ -80,15 +84,20 @@ function renderPortal(clases) {
     .filter(c => !Number.isFinite(c._fechaTimestamp) || c._fechaTimestamp >= hoyTimestamp)
     .sort((a, b) => compararFechas(a, b, 1));
 
-  const proxima = futuras[0] || null;
+  const clasesSinClase = futuras.filter(esSinClase);
+  const clasesRealesFuturas = futuras.filter(c => !esSinClase(c));
+  const proxima = clasesRealesFuturas[0] || null;
+  const avisoSinClaseHtml = clasesSinClase.length
+    ? `<div class="no-class-stack">${clasesSinClase.map(renderNoClassCard).join("")}</div>`
+    : "";
   
   const nextContainer = document.getElementById("next-container");
   
   // Renderizar próxima clase o mensaje de fin
-  if (!proxima) {
+  if (!proxima && !avisoSinClaseHtml) {
     nextContainer.innerHTML = renderDoneCard();
   } else {
-    nextContainer.innerHTML = renderNextCard(proxima);
+    nextContainer.innerHTML = `${avisoSinClaseHtml}${proxima ? renderNextCard(proxima) : renderDoneCard()}`;
   }
   
   // Renderizar avisos
@@ -127,6 +136,7 @@ function renderPortal(clases) {
   }
 
   if (nextEl) {
+    const stickyTarget = nextContainer.querySelector(".next-card") || nextEl;
     stickyObserver = new IntersectionObserver(
       (entries) => {
         const stickyBtn = document.getElementById("sticky-btn");
@@ -136,7 +146,7 @@ function renderPortal(clases) {
       },
       { threshold: 0, rootMargin: "0px 0px -20px 0px" }
     );
-    stickyObserver.observe(nextEl);
+    stickyObserver.observe(stickyTarget);
   } else {
     const stickyBtn = document.getElementById("sticky-btn");
     if (stickyBtn) {
