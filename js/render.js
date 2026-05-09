@@ -30,9 +30,9 @@ function obtenerTipoVisual(c) {
 function renderNoClassCard(c) {
   const fechaFmt = formatearFecha(c.fecha);
   const etiqueta = String(c?.tipo || "Sin Clase").trim() || "Sin Clase";
-  const motivosHtml = c.temas?.length
-    ? c.temas.map(t => `<span class="topic-chip topic-chip-muted">${escapeHtml(t.texto)}</span>`).join("")
-    : '<span class="topic-chip topic-chip-muted">Sin detalle cargado</span>';
+  const motivo = c.temas?.length
+    ? c.temas.map(t => escapeHtml(t.texto)).join(" · ")
+    : "Sin detalle cargado";
 
   return `
     <div class="no-class-card">
@@ -46,9 +46,8 @@ function renderNoClassCard(c) {
           </svg>
           ${escapeHtml(etiqueta)}
         </span>
+        <span class="no-class-motive">${motivo}</span>
       </div>
-      <div class="block-label">Motivo</div>
-      <div class="topics-list no-class-topics" style="margin-bottom:0">${motivosHtml}</div>
     </div>`;
 }
 

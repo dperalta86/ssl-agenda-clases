@@ -78,14 +78,16 @@ function renderPortal(clases) {
 
   // Separar clases pasadas y futuras usando fechas reales
   const pasadas = clasesConFecha
-    .filter(c => Number.isFinite(c._fechaTimestamp) && c._fechaTimestamp < hoyTimestamp)
+    .filter(c => Number.isFinite(c._fechaTimestamp) && c._fechaTimestamp < hoyTimestamp && !esSinClase(c))
     .sort((a, b) => compararFechas(a, b, -1));
 
   const futuras = clasesConFecha
     .filter(c => !Number.isFinite(c._fechaTimestamp) || c._fechaTimestamp >= hoyTimestamp)
     .sort((a, b) => compararFechas(a, b, 1));
 
-  const clasesSinClase = futuras.filter(esSinClase);
+  const clasesSinClase = clasesConFecha
+    .filter(c => esSinClase(c) && Number.isFinite(c._fechaTimestamp) && c._fechaTimestamp === hoyTimestamp)
+    .sort((a, b) => compararFechas(a, b, -1));
   const clasesRealesFuturas = futuras.filter(c => !esSinClase(c));
   const proxima = clasesRealesFuturas[0] || null;
   const avisoSinClaseHtml = clasesSinClase.length
