@@ -22,11 +22,14 @@ async function cargarClasesDesdeAPI() {
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10000); // Timeout 10s
+    const requestUrl = `${CONFIG.appsScriptUrl}${CONFIG.appsScriptUrl.includes("?") ? "&" : "?"}_ts=${Date.now()}`;
 
-    const response = await fetch(CONFIG.appsScriptUrl, {
+    const response = await fetch(requestUrl, {
       signal: controller.signal,
+      cache: "no-store",
       headers: {
-        'Accept': 'application/json'
+        'Accept': 'application/json',
+        'Cache-Control': 'no-cache'
       }
     });
     

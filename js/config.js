@@ -87,8 +87,12 @@ function aplicarConfiguracionRemota(remoteConfig) {
  */
 async function cargarConfiguracionRemota() {
   try {
-    const response = await fetch("/api/config", {
-      headers: { Accept: "application/json" },
+    const response = await fetch(`/api/config?_ts=${Date.now()}`, {
+      cache: "no-store",
+      headers: {
+        Accept: "application/json",
+        "Cache-Control": "no-cache",
+      },
     });
 
     if (!response.ok) return false;

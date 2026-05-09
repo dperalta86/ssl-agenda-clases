@@ -5,6 +5,7 @@
 
 // Variables globales del módulo
 let clasesGlobales = [];
+let snapshotDatosActuales = "";
 
 // Intervalo de refresh automático
 const REFRESH_INTERVAL_MS = 5 * 60 * 1000; // 5 minutos
@@ -14,6 +15,14 @@ let refreshPendiente = false;
 let stickyObserver = null;
 let listenersConfigurados = false;
 let eventosConfigurados = false;
+
+function crearSnapshotDatos(datos) {
+  const payload = {
+    clases: Array.isArray(datos?.clases) ? datos.clases : [],
+    entregas: Array.isArray(datos?.entregas) ? datos.entregas : [],
+  };
+  return JSON.stringify(payload);
+}
 
 /**
  * Convierte una fecha del backend a timestamp local para comparaciones.
@@ -256,15 +265,18 @@ async function refrescarDatos() {
   refreshEnCurso = true;
   try {
     const datos = await cargarClasesDesdeAPI();
-    const nuevasClases = datos.clases;
+    const nuevasClases = Array.isArray(datos.clases) ? datos.clases : [];
+    const nuevasEntregas = Array.isArray(datos.entregas) ? datos.entregas : [];
+    const snapshotNuevo = crearSnapshotDatos({ clases: nuevasClases, entregas: nuevasEntregas });
 
     // Comparar con snapshot actual para ver si algo cambió
-    const haycambios = JSON.stringify(nuevasClases) !== JSON.stringify(clasesGlobales);
+    const haycambios = snapshotNuevo !== snapshotDatosActuales;
 
     if (haycambios) {
       clasesGlobales = nuevasClases;
+      snapshotDatosActuales = snapshotNuevo;
       renderPortal(clasesGlobales);
-      renderBannerEntregas(datos.entregas || []);
+      renderBannerEntregas(nuevasEntregas);
       mostrarToast("// datos actualizados");
       console.info("[Refresh] Cambios detectados, portal re-renderizado");
     } else {
@@ -328,8 +340,9 @@ async function inicializarPortal() {
 
     // Arrancar la carga de clases sin esperar la configuración remota.
     const datos = await cargarClasesDesdeAPI();
-    clasesGlobales = datos.clases;
-    const entregas = datos.entregas || [];
+    clasesGlobales = Array.isArray(datos.clases) ? datos.clases : [];
+    const entregas = Array.isArray(datos.entregas) ? datos.entregas : [];
+    snapshotDatosActuales = crearSnapshotDatos({ clases: clasesGlobales, entregas });
     renderBannerEntregas(entregas);
     
     // Validar estructura mínima de los datos
@@ -349,6 +362,17 @@ async function inicializarPortal() {
         if (document.visibilityState === "visible") {
           refrescarDatos();
         }
+      });
+
+      // Safari iOS puede restaurar desde bfcache sin recargar recursos.
+      window.addEventListener("pageshow", (event) => {
+        if (event.persisted) {
+          refrescarDatos();
+        }
+      });
+
+      window.addEventListener("focus", () => {
+        refrescarDatos();
       });
       listenersConfigurados = true;
     }
