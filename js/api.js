@@ -46,9 +46,8 @@ async function cargarClasesDesdeAPI() {
     if (!data.clases || !Array.isArray(data.clases)) {
       throw new Error("La respuesta no contiene un array de clases válido");
     }
-
-    console.info(`[API] Clases cargadas correctamente: ${data.clases.length} registros`);
-    return data.clases;
+    console.info(`[API] Clases: ${data.clases.length} | Entregas: ${(data.entregas || []).length}`);
+    return { clases: data.clases, entregas: data.entregas || [] };
     
   } catch (error) {
     if (error.name === 'AbortError') {
