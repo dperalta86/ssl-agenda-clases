@@ -21,8 +21,8 @@
   --presencial-bg: #34d39912;
   --virtual: #60a5fa;
   --virtual-bg: #60a5fa12;
-  --sin-clase: #9ca3af;
-  --sin-clase-bg: #9ca3af10;
+  --sin-clase: #d6a96a;
+  --sin-clase-bg: #d6a96a12;
   --lab: #f59e0b;
   --lab-bg: #f59e0b12;
   --font-head: 'Syne', sans-serif;
@@ -412,21 +412,22 @@ body {
 .badge-sin-clase {
   color: var(--sin-clase);
   background: var(--sin-clase-bg);
-  border: 1px solid #9ca3af22;
+  border: 1px solid #d6a96a26;
 }
 
 .no-class-stack {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-bottom: 12px;
+  gap: 8px;
+  margin-bottom: 10px;
 }
 
 .no-class-card {
-  background: linear-gradient(180deg, #171a22 0%, #12151c 100%);
-  border: 1px solid #9ca3af26;
-  border-radius: 14px;
-  padding: 18px 20px;
+  background: linear-gradient(180deg, #181a20 0%, #13161b 100%);
+  border: 1px solid #d6a96a22;
+  border-left: 3px solid #d6a96a55;
+  border-radius: 12px;
+  padding: 11px 14px 12px;
   position: relative;
   overflow: hidden;
   animation: fadeUp .3s ease both;
@@ -436,42 +437,66 @@ body {
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at top right, #9ca3af14 0%, transparent 55%);
+  background: radial-gradient(circle at top right, #d6a96a10 0%, transparent 52%);
   pointer-events: none;
 }
 
 .no-class-eyebrow {
   font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: .12em;
+  font-size: 9px;
+  letter-spacing: .14em;
   color: var(--sin-clase);
   text-transform: uppercase;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 }
 
 .no-class-date {
   font-family: var(--font-head);
-  font-size: 18px;
+  font-size: 15px;
   font-weight: 700;
   color: var(--text);
-  line-height: 1.15;
-  margin-bottom: 10px;
+  line-height: 1.2;
+  margin-bottom: 8px;
 }
 
 .no-class-date span {
   color: var(--text-muted);
   font-weight: 400;
-  font-size: 14px;
+  font-size: 12px;
 }
 
 .no-class-badges {
-  margin-bottom: 14px;
+  margin-bottom: 10px;
+}
+
+.no-class-badges .badge-sin-clase {
+  padding: 3px 8px;
+  font-size: 10px;
+  border-radius: 999px;
+  letter-spacing: .03em;
+}
+
+.no-class-badges .badge-sin-clase svg {
+  width: 9px;
+  height: 9px;
+}
+
+.no-class-card .block-label {
+  font-size: 10px;
+  margin-bottom: 6px;
+  color: #cbb38b;
+}
+
+.no-class-topics {
+  gap: 5px;
 }
 
 .no-class-topics .topic-chip-muted {
-  color: #c3cad7;
-  background: #1b2029;
-  border-color: #2b313d;
+  color: #d8c7ab;
+  background: #1a1d22;
+  border-color: #3a3126;
+  font-size: 12px;
+  padding: 4px 10px;
 }
 
 .past-card-no-class {

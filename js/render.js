@@ -9,14 +9,16 @@
  * @returns {string} HTML de la tarjeta
  */
 function esSinClase(c) {
-  return String(c?.tipo || "").toLowerCase().includes("sin clase");
+  const tipo = String(c?.tipo || "").toLowerCase();
+  return /(sin\s+clase|sin\s+actividad|feriado|suspendid|no\s+hay\s+clase)/.test(tipo);
 }
 
 function obtenerTipoVisual(c) {
   if (esSinClase(c)) {
+    const tipo = String(c?.tipo || "").trim();
     return {
       clase: "badge-sin-clase",
-      etiqueta: "Sin Clase",
+      etiqueta: tipo || "Sin Clase",
     };
   }
 
@@ -27,13 +29,14 @@ function obtenerTipoVisual(c) {
 
 function renderNoClassCard(c) {
   const fechaFmt = formatearFecha(c.fecha);
+  const etiqueta = String(c?.tipo || "Sin Clase").trim() || "Sin Clase";
   const motivosHtml = c.temas?.length
     ? c.temas.map(t => `<span class="topic-chip topic-chip-muted">${escapeHtml(t.texto)}</span>`).join("")
     : '<span class="topic-chip topic-chip-muted">Sin detalle cargado</span>';
 
   return `
     <div class="no-class-card">
-      <div class="no-class-eyebrow">Sin Clase</div>
+      <div class="no-class-eyebrow">${escapeHtml(etiqueta)}</div>
       <div class="no-class-date">${fechaFmt.dia} <span>· ${fechaFmt.hora}</span></div>
       <div class="badges no-class-badges">
         <span class="badge badge-sin-clase">
@@ -41,7 +44,7 @@ function renderNoClassCard(c) {
             <circle cx="12" cy="12" r="8"></circle>
             <path d="M8.5 8.5l7 7"></path>
           </svg>
-          Sin Clase
+          ${escapeHtml(etiqueta)}
         </span>
       </div>
       <div class="block-label">Motivo</div>

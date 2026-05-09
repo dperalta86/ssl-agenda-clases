@@ -25,7 +25,8 @@ function crearSnapshotDatos(datos) {
 }
 
 function esSinClase(clase) {
-  return String(clase?.tipo || "").toLowerCase().includes("sin clase");
+  const tipo = String(clase?.tipo || "").toLowerCase();
+  return /(sin\s+clase|sin\s+actividad|feriado|suspendid|no\s+hay\s+clase)/.test(tipo);
 }
 
 /**
