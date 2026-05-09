@@ -6,6 +6,15 @@
 // Variables globales del módulo
 let clasesGlobales = [];
 
+// Intervalo de refresh automático
+const REFRESH_INTERVAL_MS = 5 * 60 * 1000; // 5 minutos
+let refreshTimer = null;
+let refreshEnCurso = false;
+let refreshPendiente = false;
+let stickyObserver = null;
+let listenersConfigurados = false;
+let eventosConfigurados = false;
+
 /**
  * Convierte una fecha del backend a timestamp local para comparaciones.
  * @param {string} fecha - Fecha en cualquier formato parseable por Date.
@@ -103,15 +112,27 @@ function renderPortal(clases) {
   
   // Configurar observer para botón sticky
   const nextEl = nextContainer.firstElementChild;
+  if (stickyObserver) {
+    stickyObserver.disconnect();
+    stickyObserver = null;
+  }
+
   if (nextEl) {
-    const observer = new IntersectionObserver(
+    stickyObserver = new IntersectionObserver(
       (entries) => {
         const stickyBtn = document.getElementById("sticky-btn");
-        stickyBtn.classList.toggle("show", !entries[0].isIntersecting);
+        if (stickyBtn) {
+          stickyBtn.classList.toggle("show", !entries[0].isIntersecting);
+        }
       },
       { threshold: 0, rootMargin: "0px 0px -20px 0px" }
     );
-    observer.observe(nextEl);
+    stickyObserver.observe(nextEl);
+  } else {
+    const stickyBtn = document.getElementById("sticky-btn");
+    if (stickyBtn) {
+      stickyBtn.classList.remove("show");
+    }
   }
 }
 
@@ -225,6 +246,62 @@ function renderBannerEntregas(entregas) {
   banner.style.display = "";
 }
 
+async function refrescarDatos() {
+  if (refreshEnCurso) {
+    refreshPendiente = true;
+    console.info("[Refresh] Ya hay una actualización en curso, se difiere una sola repetición");
+    return;
+  }
+
+  refreshEnCurso = true;
+  try {
+    const datos = await cargarClasesDesdeAPI();
+    const nuevasClases = datos.clases;
+
+    // Comparar con snapshot actual para ver si algo cambió
+    const haycambios = JSON.stringify(nuevasClases) !== JSON.stringify(clasesGlobales);
+
+    if (haycambios) {
+      clasesGlobales = nuevasClases;
+      renderPortal(clasesGlobales);
+      renderBannerEntregas(datos.entregas || []);
+      mostrarToast("// datos actualizados");
+      console.info("[Refresh] Cambios detectados, portal re-renderizado");
+    } else {
+      console.info("[Refresh] Sin cambios");
+    }
+  } catch (err) {
+    console.warn("[Refresh] Error silencioso:", err.message);
+    // No mostramos nada al usuario si falla el refresh
+  } finally {
+    refreshEnCurso = false;
+
+    if (refreshPendiente) {
+      refreshPendiente = false;
+      refrescarDatos();
+    }
+  }
+}
+
+function mostrarToast(mensaje) {
+  const existing = document.getElementById("refresh-toast");
+  if (existing) existing.remove();
+
+  const toast = document.createElement("div");
+  toast.id = "refresh-toast";
+  toast.textContent = mensaje;
+  document.body.appendChild(toast);
+
+  // Forzar reflow para que la animación arranque
+  toast.getBoundingClientRect();
+  toast.classList.add("toast-visible");
+
+  setTimeout(() => {
+    toast.classList.remove("toast-visible");
+    setTimeout(() => toast.remove(), 400);
+  }, 3000);
+}
+
 /**
  * Carga los datos y renderiza el portal
  */
@@ -242,7 +319,11 @@ async function inicializarPortal() {
     // Pintar header con la configuración disponible y refrescarlo cuando llegue la remota.
     actualizarHeader();
     if (typeof cargarConfiguracionRemota === "function") {
-      cargarConfiguracionRemota().then(actualizarHeader);
+      cargarConfiguracionRemota()
+        .then(actualizarHeader)
+        .catch((error) => {
+          console.warn("[Main] Error al cargar la configuración remota:", error?.message || error);
+        });
     }
 
     // Arrancar la carga de clases sin esperar la configuración remota.
@@ -261,6 +342,20 @@ async function inicializarPortal() {
     
     // Configurar eventos después del renderizado
     configurarEventos();
+
+    // Refresh automático al volver a la pestaña (si hubo cambios)
+    if (!listenersConfigurados) {
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "visible") {
+          refrescarDatos();
+        }
+      });
+      listenersConfigurados = true;
+    }
+
+    // Refresh automático silencioso (página abierta)
+    if (refreshTimer) clearInterval(refreshTimer);
+    refreshTimer = setInterval(refrescarDatos, REFRESH_INTERVAL_MS);
     
   } catch (error) {
     console.error("[Main] Error al inicializar:", error);
@@ -276,6 +371,10 @@ function configurarEventos() {
   const header = document.querySelector(".header");
   const menuToggle = document.getElementById("menu-toggle");
   actualizarHeader();
+
+  if (eventosConfigurados) {
+    return;
+  }
 
   if (menuToggle && header) {
     const closeMenu = () => {
@@ -307,6 +406,8 @@ function configurarEventos() {
       link.addEventListener("click", closeMenu);
     });
   }
+
+  eventosConfigurados = true;
   
   // Botón "volver a próxima clase" (dentro de la sección de clases pasadas)
   const backBtn = document.getElementById("back-to-next-btn");

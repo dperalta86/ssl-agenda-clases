@@ -882,5 +882,30 @@ body {
   .eb-item  { font-size: 11px; padding: 3px 8px; }
 }
 
+/* ── Toast de refresh ─────────────────────────────────── */
+#refresh-toast {
+  position: fixed;
+  bottom: 24px;
+  left: 24px;
+  background: var(--surface2);
+  border: 1px solid var(--border-accent);
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: .08em;
+  padding: 8px 14px;
+  border-radius: 6px;
+  z-index: 300;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity .3s ease, transform .3s ease;
+  pointer-events: none;
+}
+
+#refresh-toast.toast-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 /* Badge de entrega en next-card — reemplazado por el banner */
 .badge-entrega { display: none; }
