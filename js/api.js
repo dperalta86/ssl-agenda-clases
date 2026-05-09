@@ -5,13 +5,13 @@
 
 /**
  * Carga las clases desde Apps Script o usa mock como fallback
- * @returns {Promise<Array>} Lista de clases
+ * @returns {Promise<{clases: Array, entregas: Array}>} Objeto con clases y entregas
  */
 async function cargarClasesDesdeAPI() {
   // Si la URL es de ejemplo, usar datos mock
   if (CONFIG.appsScriptUrl.startsWith("TU_")) {
     console.info("[API] Usando datos mock - Reemplazar appsScriptUrl en config.js");
-    return [...MOCK_CLASES];
+    return { clases: [...MOCK_CLASES], entregas: [...MOCK_ENTREGAS] };
   }
 
   // Validar que la URL sea HTTPS (seguridad)
