@@ -1,6 +1,7 @@
 /**
  * CONFIGURACIÓN DEL CURSO
  * Editar solo esta sección para personalizar el portal
+ * TODO: Validar si es .env o si lo hacemos mediante endpoint para evitar redeploy
  */
 
 function obtenerAppsScriptUrlPorDefecto() {
@@ -13,7 +14,7 @@ function obtenerAppsScriptUrlPorDefecto() {
       host === "::1";
 
     if (esLocal) {
-      return "https://script.google.com/macros/s/AKfycbyVXCAwZldmCHijA1HsaKiU3vCftaoJrk1LoJgq76jOupb-fLX6FfIHa6RmWqIsq3oN/exec";
+      return "https://script.google.com/macros/s/AKfycbweAxR3Kr5RS4fooSAtLww1ahIkI4fuY-CUgb7RsUNRCE5svpNPyguFQZN38fzH14fN/exec";
     }
   }
 

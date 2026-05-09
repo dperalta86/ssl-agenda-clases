@@ -764,3 +764,123 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+/* ── Entregas Banner ──────────────────────────────────── */
+#entregas-banner {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+}
+
+.eb-inner {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 10px 0;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.eb-titulo {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: .1em;
+  color: var(--text-dim);
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.eb-badge {
+  background: #ef444480;
+  color: #fca5a5;
+  border: 1px solid #ef444433;
+  border-radius: 999px;
+  font-size: 10px;
+  padding: 1px 6px;
+  font-family: var(--font-mono);
+  animation: pulse-badge 2s ease infinite;
+}
+
+@keyframes pulse-badge {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: .5; }
+}
+
+.eb-lista {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.eb-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  border-radius: 6px;
+  padding: 4px 10px;
+  text-decoration: none;
+  font-family: var(--font-mono);
+  transition: all .15s;
+  border: 1px solid transparent;
+}
+
+/* urgente: rojo */
+.eb-urgent {
+  color: #fca5a5;
+  background: #ef444412;
+  border-color: #ef444430;
+}
+.eb-item.eb-urgent[href]:hover {
+  background: #ef444422;
+  border-color: #ef444460;
+}
+
+/* próximo: amarillo */
+.eb-upcoming {
+  color: #fcd34d;
+  background: #f59e0b10;
+  border-color: #f59e0b28;
+}
+.eb-item.eb-upcoming[href]:hover {
+  background: #f59e0b20;
+  border-color: #f59e0b50;
+}
+
+/* vencido: "muerte" — opaco, tachado */
+.eb-dead {
+  color: var(--text-dim);
+  background: transparent;
+  border-color: var(--border);
+  opacity: .5;
+}
+.eb-dead .eb-nombre {
+  text-decoration: line-through;
+}
+
+.eb-icon {
+  font-size: 11px;
+}
+
+.eb-nombre {
+  font-weight: 500;
+}
+
+.eb-fecha {
+  font-size: 10px;
+  opacity: .7;
+  letter-spacing: .04em;
+}
+
+@media (max-width: 600px) {
+  #entregas-banner { padding: 0 16px; }
+  .eb-lista { gap: 5px; }
+  .eb-item  { font-size: 11px; padding: 3px 8px; }
+}
+
+/* Badge de entrega en next-card — reemplazado por el banner */
+.badge-entrega { display: none; }
