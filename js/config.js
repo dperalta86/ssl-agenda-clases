@@ -161,3 +161,9 @@ const MOCK_CLASES = [
     juegos: [],
   },
 ];
+
+const MOCK_ENTREGAS = [
+  { tipo: "Lab",      nombre: "Lab 03 · Tokenizador",     fecha: "2026-05-12", url: "https://github.com/...", notas: null },
+  { tipo: "TP",       nombre: "TP1 · Analizador Léxico",  fecha: "2026-05-18", url: "https://github.com/...", notas: null },
+  { tipo: "Parcial",  nombre: "Primer Parcial",            fecha: "2026-06-10", url: null, notas: "Aula 302" },
+];
