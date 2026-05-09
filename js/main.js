@@ -76,18 +76,23 @@ function renderPortal(clases) {
   const clasesConFecha = clases
     .map(c => ({ ...c, _fechaTimestamp: normalizarFechaClase(c.fecha) }));
 
-  // Separar clases pasadas y futuras usando fechas reales
+  // Todas las clases pasadas (incluyendo Sin Clase, que irán al historial)
   const pasadas = clasesConFecha
-    .filter(c => Number.isFinite(c._fechaTimestamp) && c._fechaTimestamp < hoyTimestamp && !esSinClase(c))
+    .filter(c => Number.isFinite(c._fechaTimestamp) && c._fechaTimestamp < hoyTimestamp)
     .sort((a, b) => compararFechas(a, b, -1));
 
   const futuras = clasesConFecha
     .filter(c => !Number.isFinite(c._fechaTimestamp) || c._fechaTimestamp >= hoyTimestamp)
     .sort((a, b) => compararFechas(a, b, 1));
 
-  const clasesSinClase = clasesConFecha
-    .filter(c => esSinClase(c) && Number.isFinite(c._fechaTimestamp) && c._fechaTimestamp === hoyTimestamp)
-    .sort((a, b) => compararFechas(a, b, -1));
+  // Sin Clase que están en los próximos 7 días desde hoy
+  const diasEnMs = 7 * 24 * 60 * 60 * 1000;
+  const proximosSieteDias = hoyTimestamp + diasEnMs;
+  const clasesSinClase = futuras
+    .filter(c => esSinClase(c) && Number.isFinite(c._fechaTimestamp) && c._fechaTimestamp <= proximosSieteDias)
+    .sort((a, b) => compararFechas(a, b, 1));
+  
+  // La próxima clase real (Presencial o Virtual, excluyendo suspensiones)
   const clasesRealesFuturas = futuras.filter(c => !esSinClase(c));
   const proxima = clasesRealesFuturas[0] || null;
   const avisoSinClaseHtml = clasesSinClase.length
