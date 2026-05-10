@@ -52,6 +52,7 @@ function normalizarFechaClase(fecha) {
  * @returns {number}
  */
 function compararFechas(a, b, direction = 1) {
+  let mensajesGlobales = [];
   const aValida = Number.isFinite(a._fechaTimestamp);
   const bValida = Number.isFinite(b._fechaTimestamp);
 
@@ -65,7 +66,8 @@ function compararFechas(a, b, direction = 1) {
 }
 
 /**
- * Renderiza todo el portal con los datos cargados
+      const snapshotNuevo = crearSnapshotDatos({ clases: nuevasClases, entregas: nuevasEntregas });
+      mensajesGlobales = Array.isArray(datos.messages) ? datos.messages : [];
  * @param {Array} clases - Lista de todas las clases
  */
 function renderPortal(clases) {
@@ -111,10 +113,14 @@ function renderPortal(clases) {
   // Renderizar avisos
   const noticesSection = document.getElementById("notices-section");
   const noticesList = document.getElementById("notices-list");
-  
-  if (CONFIG.avisos && CONFIG.avisos.length > 0) {
+  // Mostrar mensajes desde la planilla si existen, sino fallback a CONFIG.avisos
+  const mensajes = (Array.isArray(mensajesGlobales) && mensajesGlobales.length > 0)
+    ? mensajesGlobales.slice(0, 2).map(m => ({ texto: `<strong>${escapeHtml(m.usuario)}</strong> ${escapeHtml(m.mensaje)}`, tiempo: m.fecha }))
+    : (Array.isArray(CONFIG.avisos) ? CONFIG.avisos.slice(0, 2) : []);
+
+  if (mensajes.length > 0) {
     noticesSection.style.display = "";
-    noticesList.innerHTML = CONFIG.avisos.map(a => `
+    noticesList.innerHTML = mensajes.map(a => `
       <div class="notice-card">
         <div class="notice-dot"></div>
         <div>
@@ -123,6 +129,8 @@ function renderPortal(clases) {
         </div>
       </div>
     `).join("");
+  } else {
+    noticesSection.style.display = "none";
   }
   
   // Renderizar clases pasadas
