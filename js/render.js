@@ -94,7 +94,7 @@ function renderNextCard(c) {
        <div class="block-label">Recursos para esta clase</div>
        <div class="links-grid">
          ${recursos.map(r => `
-           <a class="res-link" href="${r.url}" target="_blank" rel="noopener noreferrer">
+           <a class="res-link" href="${r.url}" target="_blank" rel="noopener noreferrer" title="${escapeHtml(r.texto)}" aria-label="${escapeHtml(r.texto)}">
              <div class="res-icon ${r.tipo}">${iconoTipo(r.tipo)}</div>
              <div class="res-text">
                <div class="res-name">${escapeHtml(r.texto)}</div>
@@ -141,10 +141,10 @@ function renderPastCard(c) {
   const miniLinks = esSinClase(c)
     ? ""
     : (() => {
-        const todosLinks = [...(c.temas || []), ...(c.lecturas || []), ...(c.ejercicios || []), ...(c.cierres || [])];
+        const todosLinks = [...(c.temas || []), ...(c.lecturas || []), ...(c.ejercicios || []), ...(c.cierres || []), ...(c.juegos || [])];
         const linksConUrl = todosLinks.filter(r => r.url && isValidUrl(r.url)).slice(0, 4);
         return linksConUrl.map(r =>
-          `<a class="mini-link" href="${r.url}" target="_blank" rel="noopener noreferrer" title="${escapeHtml(r.texto)}">
+          `<a class="mini-link" href="${r.url}" target="_blank" rel="noopener noreferrer" title="${escapeHtml(r.texto)}" aria-label="${escapeHtml(r.texto)}">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13">
               <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
               <polyline points="15 3 21 3 21 9"/>

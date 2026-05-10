@@ -627,15 +627,30 @@ body {
   display: flex;
   flex-direction: column;
   gap: 1px;
+  width: 100%;
   overflow: hidden;
 }
 
 .res-name {
+  display: block;
   font-weight: 500;
   font-size: 13px;
+  /* Default: truncate in one line for very narrow containers (mobile) */
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* Desktop: allow up to 2 lines and clamp, keep ellipsis */
+@media (min-width: 760px) {
+  .res-name {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    white-space: normal;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }
 
 .res-type {
@@ -693,6 +708,12 @@ body {
   color: var(--text-dim);
   font-family: var(--font-mono);
   margin-top: 3px;
+}
+
+.notice-channel {
+  color: var(--accent);
+  margin-left: 6px;
+  white-space: nowrap;
 }
 
 /* ── Past classes ─────────────────────────────────────── */

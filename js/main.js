@@ -114,7 +114,11 @@ function renderPortal(clases) {
   const noticesList = document.getElementById("notices-list");
   // Mostrar mensajes desde la planilla si existen, sino fallback a CONFIG.avisos
   const mensajes = (Array.isArray(mensajesGlobales) && mensajesGlobales.length > 0)
-    ? mensajesGlobales.slice(0, 2).map(m => ({ texto: `<strong>${escapeHtml(m.usuario)}</strong> ${escapeHtml(m.mensaje)}`, tiempo: m.fecha }))
+    ? mensajesGlobales.slice(0, 2).map(m => ({
+        texto: `${escapeHtml(m.usuario)} ${escapeHtml(m.mensaje)}`,
+        tiempo: m.fecha,
+        canal: m.canal,
+      }))
     : (Array.isArray(CONFIG.avisos) ? CONFIG.avisos.slice(0, 2) : []);
 
   if (mensajes.length > 0) {
@@ -124,7 +128,7 @@ function renderPortal(clases) {
         <div class="notice-dot"></div>
         <div>
           <div class="notice-text">${a.texto}</div>
-          <div class="notice-time">${escapeHtml(a.tiempo)}</div>
+          <div class="notice-time">${escapeHtml(a.tiempo)}${a.canal ? ` <span class="notice-channel">${escapeHtml(a.canal)}</span>` : ""}</div>
         </div>
       </div>
     `).join("");
