@@ -6,6 +6,7 @@
 // Variables globales del módulo
 let clasesGlobales = [];
 let snapshotDatosActuales = "";
+let mensajesGlobales = [];
 
 // Intervalo de refresh automático
 const REFRESH_INTERVAL_MS = 5 * 60 * 1000; // 5 minutos
@@ -20,6 +21,7 @@ function crearSnapshotDatos(datos) {
   const payload = {
     clases: Array.isArray(datos?.clases) ? datos.clases : [],
     entregas: Array.isArray(datos?.entregas) ? datos.entregas : [],
+    messages: Array.isArray(datos?.messages) ? datos.messages : [],
   };
   return JSON.stringify(payload);
 }
@@ -52,7 +54,6 @@ function normalizarFechaClase(fecha) {
  * @returns {number}
  */
 function compararFechas(a, b, direction = 1) {
-  let mensajesGlobales = [];
   const aValida = Number.isFinite(a._fechaTimestamp);
   const bValida = Number.isFinite(b._fechaTimestamp);
 
@@ -66,8 +67,6 @@ function compararFechas(a, b, direction = 1) {
 }
 
 /**
-      const snapshotNuevo = crearSnapshotDatos({ clases: nuevasClases, entregas: nuevasEntregas });
-      mensajesGlobales = Array.isArray(datos.messages) ? datos.messages : [];
  * @param {Array} clases - Lista de todas las clases
  */
 function renderPortal(clases) {
@@ -293,13 +292,15 @@ async function refrescarDatos() {
     const datos = await cargarClasesDesdeAPI();
     const nuevasClases = Array.isArray(datos.clases) ? datos.clases : [];
     const nuevasEntregas = Array.isArray(datos.entregas) ? datos.entregas : [];
-    const snapshotNuevo = crearSnapshotDatos({ clases: nuevasClases, entregas: nuevasEntregas });
+    const nuevasMensajes = Array.isArray(datos.messages) ? datos.messages : [];
+    const snapshotNuevo = crearSnapshotDatos({ clases: nuevasClases, entregas: nuevasEntregas, messages: nuevasMensajes });
 
     // Comparar con snapshot actual para ver si algo cambió
     const haycambios = snapshotNuevo !== snapshotDatosActuales;
 
     if (haycambios) {
       clasesGlobales = nuevasClases;
+      mensajesGlobales = nuevasMensajes;
       snapshotDatosActuales = snapshotNuevo;
       renderPortal(clasesGlobales);
       renderBannerEntregas(nuevasEntregas);
@@ -368,7 +369,8 @@ async function inicializarPortal() {
     const datos = await cargarClasesDesdeAPI();
     clasesGlobales = Array.isArray(datos.clases) ? datos.clases : [];
     const entregas = Array.isArray(datos.entregas) ? datos.entregas : [];
-    snapshotDatosActuales = crearSnapshotDatos({ clases: clasesGlobales, entregas });
+    mensajesGlobales = Array.isArray(datos.messages) ? datos.messages : [];
+    snapshotDatosActuales = crearSnapshotDatos({ clases: clasesGlobales, entregas, messages: mensajesGlobales });
     renderBannerEntregas(entregas);
     
     // Validar estructura mínima de los datos
