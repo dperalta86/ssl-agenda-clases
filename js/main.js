@@ -47,6 +47,26 @@ function normalizarFechaClase(fecha) {
 }
 
 /**
+ * Calcula el corte para decidir si una clase ya pasó o sigue vigente.
+ * Hasta las 22:30 del día actual, las clases de hoy se siguen mostrando como futuras.
+ * @returns {number} Timestamp local del inicio del período a considerar como "pasado".
+ */
+function obtenerCorteFechaClases() {
+  const ahora = new Date();
+  const corte = new Date(ahora);
+  corte.setHours(22, 30, 0, 0);
+
+  const inicioValidacion = new Date(ahora);
+  inicioValidacion.setHours(0, 0, 0, 0);
+
+  if (ahora >= corte) {
+    inicioValidacion.setDate(inicioValidacion.getDate() + 1);
+  }
+
+  return inicioValidacion.getTime();
+}
+
+/**
  * Ordena timestamps con soporte para valores inválidos al final.
  * @param {Object} a - Clase con timestamp normalizado.
  * @param {Object} b - Clase con timestamp normalizado.
@@ -70,25 +90,23 @@ function compararFechas(a, b, direction = 1) {
  * @param {Array} clases - Lista de todas las clases
  */
 function renderPortal(clases) {
-  const hoy = new Date();
-  hoy.setHours(0, 0, 0, 0);
-  const hoyTimestamp = hoy.getTime();
+  const corteFechaClases = obtenerCorteFechaClases();
   
   const clasesConFecha = clases
     .map(c => ({ ...c, _fechaTimestamp: normalizarFechaClase(c.fecha) }));
 
   // Todas las clases pasadas (incluyendo Sin Clase, que irán al historial)
   const pasadas = clasesConFecha
-    .filter(c => Number.isFinite(c._fechaTimestamp) && c._fechaTimestamp < hoyTimestamp)
+    .filter(c => Number.isFinite(c._fechaTimestamp) && c._fechaTimestamp < corteFechaClases)
     .sort((a, b) => compararFechas(a, b, -1));
 
   const futuras = clasesConFecha
-    .filter(c => !Number.isFinite(c._fechaTimestamp) || c._fechaTimestamp >= hoyTimestamp)
+    .filter(c => !Number.isFinite(c._fechaTimestamp) || c._fechaTimestamp >= corteFechaClases)
     .sort((a, b) => compararFechas(a, b, 1));
 
   // Sin Clase que están en los próximos 7 días desde hoy
   const diasEnMs = 7 * 24 * 60 * 60 * 1000;
-  const proximosSieteDias = hoyTimestamp + diasEnMs;
+  const proximosSieteDias = corteFechaClases + diasEnMs;
   const clasesSinClase = futuras
     .filter(c => esSinClase(c) && Number.isFinite(c._fechaTimestamp) && c._fechaTimestamp <= proximosSieteDias)
     .sort((a, b) => compararFechas(a, b, 1));
