@@ -154,21 +154,17 @@ function renderPastCard(c) {
         ).join("");
       })();
 
-  // Mostrar enlace destacado a 'Juegos' si existen juegos para la clase
+  // Mostrar iconos de 'Juegos' solo para entradas con URL valida
   const juegosHtml = (() => {
     if (!c.juegos || !c.juegos.length) return "";
-    // Preferir primer juego con URL válida
-    const juegoConUrl = c.juegos.find(r => r.url && isValidUrl(r.url));
-    if (juegoConUrl) {
-      return ` <a class="mini-link juego-link" href="${juegoConUrl.url}" target="_blank" rel="noopener noreferrer" title="${escapeHtml(juegoConUrl.texto || 'Juego')}" aria-label="${escapeHtml(juegoConUrl.texto || 'Juego')}">
+    const juegosConUrl = c.juegos.filter(r => r.url && isValidUrl(r.url));
+    if (!juegosConUrl.length) return "";
+
+    return juegosConUrl.map(juego => ` <a class="mini-link juego-link" href="${juego.url}" target="_blank" rel="noopener noreferrer" title="${escapeHtml(juego.texto || 'Juego')}" aria-label="${escapeHtml(juego.texto || 'Juego')}">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13">
                   <path d="M12 2a5 5 0 0 0-5 5v1a5 5 0 0 0 5 5 5 5 0 0 0 5-5V7a5 5 0 0 0-5-5z"/>
                 </svg>
-               </a>`;
-    }
-    // Si no hay URL, mostrar texto corto como label (no link)
-    const texto = escapeHtml(String(c.juegos[0].texto || "Juego"));
-    return ` <span class="mini-link juego-label" title="${texto}">${texto}</span>`;
+               </a>`).join("");
   })();
 
   return `
